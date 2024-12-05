@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos en Tiempo Real - Calidad del Aire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            width: 250px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card h2 {
+            text-align: center;
+            color: #333;
+        }
+        .card p {
+            font-size: 1.2em;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .update-button {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .update-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Monitor de Calidad del Aire en Tiempo Real</h1>
+    <div class="container">
+        <div class="card">
+            <h2>CO (ppm)</h2>
+            <p id="co_ppm">Cargando...</p>
+        </div>
+        <div class="card">
+            <h2>PM10 (µg/m³)</h2>
+            <p id="pm10">Cargando...</p>
+        </div>
+        <div class="card">
+            <h2>PM2.5 (µg/m³)</h2>
+            <p id="pm25">Cargando...</p>
+        </div>
+        <div class="card">
+            <h2>Ruido (dB)</h2>
+            <p id="ruido">Cargando...</p>
+        </div>
+    </div>
+
+    <button class="update-button" onclick="getData()">Actualizar Datos</button>
+
+    <script>
+        const apiKey = "4OD17ULM5AP8C35N";  // Reemplaza con tu API Key de ThingSpeak
+        const channelID = "2775395";  // Reemplaza con tu Channel ID de ThingSpeak
+
+        // Función para obtener los datos de ThingSpeak
+        function getData() {
+            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=2`; // Obtiene los últimos dos registros
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const feeds = data.feeds;
+
+                    // Obtener los valores de los sensores
+                    const co_ppm = feeds[1].field1;  // CO en ppm
+                    const pm10 = feeds[1].field2;   // PM10 en µg/m³
+                    const pm25 = feeds[1].field3;   // PM2.5 en µg/m³
+                    const ruido = feeds[1].field4;  // Ruido en dB
+
+                    // Actualizar los elementos de la página
+                    document.getElementById("co_ppm").textContent = `${co_ppm} ppm`;
+                    document.getElementById("pm10").textContent = `${pm10} µg/m³`;
+                    document.getElementById("pm25").textContent = `${pm25} µg/m³`;
+                    document.getElementById("ruido").textContent = `${ruido} dB`;
+                })
+                .catch(error => console.error('Error al obtener datos de ThingSpeak:', error));
+        }
+
+        // Llamar a la función para obtener los datos cuando la página carga
+        window.onload = getData;
+    </script>
+</body>
+</html>
